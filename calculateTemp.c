@@ -7,6 +7,16 @@
 //un temperatura recibida en notación hexadecimal
 
 
+
+int calcularVelocidad(int frecuencia){
+  printf("La cantidad rencuencia es:%d\n",frecuencia);
+  int velocidad = frecuencia/1000;
+  printf("La velocidad es:%d\n",velocidad);
+  return velocidad;
+  }
+
+
+
 float tranformar(int temp){
   float tempf = (float)temp;
   //printf("conversion:%f\n",tempf);
@@ -50,7 +60,7 @@ int calcular(char hexa[5]){
   int num = conversionHexDec(hexa);
   //printf("El num entero:%d ",num);
   float numTrans = tranformar(num);
-  printf("Tranf:%f ",tranformar(num));
-  printf("Val:%f\n", validarTemperatura(anterior,numTrans));
+  printf("Tranf:%.2f ",tranformar(num));
+  printf("Val:%.2f\n", validarTemperatura(anterior,numTrans));
   return 0;
 }
