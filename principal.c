@@ -4,6 +4,7 @@
 
 #include "time.h"
 #include "client.h"
+#include "server.h"
 
 //supongo que el segundo argumento es el nombre del archivo
 int main(int argc, char *argv[]){
@@ -16,7 +17,10 @@ int main(int argc, char *argv[]){
     printf("Hola soy un cliente\n");
     client(argc,argv);
   }
-	if (strcmp(argv[1],"server") == 0){printf("Hola soy un servidor\n");}
+	if (strcmp(argv[1],"server") == 0){
+    printf("Hola soy un servidor\n");
+    server(argc,argv);
+  }
   //file_t* file = file_open("values.dat","rb");
   // while (file_read(file,&buffer) != 0){
   //   n++;
