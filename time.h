@@ -4,9 +4,9 @@
 
 
 //Funciones
-int wait(int (*lista)[3]);
-void getHrMinSec(char* hora,int (*lista)[3]);
-void printTime(int (*lista)[3]);
+int wait(int (*lista)[6]);
+void getHrMinSec(char* hora,int (*lista)[6]);
+void printTime(int (*lista)[6]);
 int incrementMinute(int *minutes);
 
 #endif

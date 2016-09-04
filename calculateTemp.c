@@ -15,7 +15,7 @@ float calcularVelocidad(int frecuencia){
   }
 
 
-
+//calcula de manera lineal la temperatura
 float tranformar(int temp){
   float tempf = (float)temp;
   //printf("conversion:%f\n",tempf);
@@ -23,7 +23,7 @@ float tranformar(int temp){
 }
 
 int conversionHexDec(char* hexadecimal) {
-    printf("Hexadecimal:%s ",hexadecimal);
+    //printf("Hexadecimal:%s ",hexadecimal);
     int numDecimal = 0;
     char hexDigitos[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D'
     ,'E','F'};
@@ -39,7 +39,7 @@ int conversionHexDec(char* hexadecimal) {
         }
         potencia++;
     }
-    printf("Decimal:%d ", numDecimal);
+    //printf("Decimal:%d ", numDecimal);
     return numDecimal;
 }
 
@@ -53,13 +53,10 @@ float validarTemperatura(float anterior, float actual){
 
 
 
-int calcular(char hexa[5]){
-  float anterior = 0.0;
-  //printf("Argumento:%s\n",hexa);
+int calcular(char hexa[5],char temp[5]){
   int num = conversionHexDec(hexa);
   //printf("El num entero:%d ",num);
   float numTrans = tranformar(num);
-  printf("Tranf:%.2f ",tranformar(num));
-  printf("Val:%.2f\n", validarTemperatura(anterior,numTrans));
+  snprintf(temp,sizeof(*temp),"%.2f",numTrans);
   return 0;
 }
