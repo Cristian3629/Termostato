@@ -8,11 +8,7 @@
 
 
 void printTime(int (*lista)[3]){
-  if ((*lista)[2] > 10){
-    printf("El tiempo actual:%d:%d:%d\n",(*lista)[0],(*lista)[1],(*lista)[2]);
-  }else{
-    printf("El tiempo actual:%d:%d:0%d\n",(*lista)[0],(*lista)[1],(*lista)[2]);
-  }
+    printf("El tiempo actual:%02d:%02d:00\n",(*lista)[0],(*lista)[1]);
   }
 
 int getHrMinSec(char* hora,int (*lista)[3]){
@@ -26,8 +22,8 @@ int getHrMinSec(char* hora,int (*lista)[3]){
   (*lista)[0] = hours;
   (*lista)[1] = minutes;
   (*lista)[2] = seconds;
-  printf("El año es:%d mes:%d dia:%d\n",anio,mes,dia);
-  printTime(lista);
+  //printf("El año es:%d mes:%d dia:%d\n",anio,mes,dia);
+  //printTime(lista);
   return 0;
 }
 
@@ -35,37 +31,28 @@ int getHrMinSec(char* hora,int (*lista)[3]){
 int incrementMinute(int (*lista)[3]){
   if ( (*lista)[1] < 59 ){
     (*lista)[1] = (*lista)[1] +1;
+    return 1;
   }else{
     (*lista)[1] = 0;
+    return 0;
   }
-  return 0;
 }
 
-
-int incrementSeconds(int (*lista)[3] , int diferencia){
-  (*lista)[2] = (*lista)[2] + diferencia;
-  if ((*lista)[2] >= 60){
-    (*lista)[2] = (*lista)[2] - 60;
+int incrementHour(int (*lista)[3]){
+  if ((*lista)[0] < 23){
+    (*lista)[0] = (*lista)[0] + 1;
+    return 1;
+  }else{
+    (*lista)[0] = 0;
+    return 0;
   }
-  return 0;
 }
-
 
 int wait(int (*lista)[3]){
-  printf("Ingresando en wait\n");
-  // time_t hora;
-  // struct tm * horainfo;
-  int diferencia = 60 - (*lista)[2];
-  printf("diferencia:%d\n",diferencia);
-  sleep(diferencia);
-  // time(&hora);
-  // horainfo = localtime(&hora);
-  // //printf("Hora y Fecha: %s", asctime(horainfo));
-  // printf("Enviando...");
-  // printf("Hora y Fecha: %s", asctime(horainfo));
-  // printf("Cantidad:10\n");
-  incrementMinute(lista);
-  incrementSeconds(lista,diferencia);
+  (*lista)[2] = 0;
+  if (!incrementMinute(lista)){
+    incrementHour(lista);
+  }
   printTime(lista);
   return 0;
 }

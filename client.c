@@ -36,12 +36,33 @@ int client(int argc, char* argv[]){
     //printf("El valor de hexa:%s\n",hexa);
     calcular(hexa);
   }
-  //printf("La cantidad de mediciones es:%d\n",n);
-  //printf("La frecuencia es:%s\n",argv[7]);
+
+  //la velocidad es mediciones por segundo
   int frecuencia = atoi(argv[5]);
-  printf("La velocidad es:%d\n",calcularVelocidad(frecuencia));
-  printf("El tiempo es %s\n",argv[6]);
+  float velocidad = calcularVelocidad(frecuencia);
+  printf("La velocidad es:%.0f\n",velocidad);
+  //parseo la hora y lo guardo en el array
   getHrMinSec(argv[6],&timeArray);
+  int diferencia = 60 - timeArray[2];
+  int cantidad = (int)diferencia*velocidad;
+  printf("Cantidad de datos a enviar:%d\n",cantidad);
+  wait(&timeArray);
+  diferencia = 60 - timeArray[2];
+  cantidad = (int)diferencia*velocidad;
+  printf("Cantidad de datos a enviar:%.0f\n",diferencia*velocidad);
+  wait(&timeArray);
+  diferencia = 60 - timeArray[2];
+  cantidad = (int)diferencia*velocidad;
+  printf("Cantidad de datos a enviar:%.0f\n",diferencia*velocidad);
+  wait(&timeArray);
+  diferencia = 60 - timeArray[2];
+  cantidad = (int)diferencia*velocidad;
+  printf("Cantidad de datos a enviar:%.0f\n",diferencia*velocidad);
+  wait(&timeArray);
+  diferencia = 60 - timeArray[2];
+  cantidad = (int)diferencia*velocidad;
+  printf("Cantidad de datos a enviar:%.0f\n",diferencia*velocidad);
+  wait(&timeArray);
   file_close(file);
   return 0;
 }

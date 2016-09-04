@@ -8,11 +8,10 @@
 
 
 
-int calcularVelocidad(int frecuencia){
-  printf("La cantidad rencuencia es:%d\n",frecuencia);
-  int velocidad = frecuencia/1000;
-  printf("La velocidad es:%d\n",velocidad);
-  return velocidad;
+float calcularVelocidad(int frecuencia){
+  //printf("La cantidad rencuencia es:%d\n",frecuencia);
+  //printf("La velocidad es:%d\n",velocidad);
+  return 1000.0/frecuencia;
   }
 
 

@@ -6,6 +6,6 @@
 //Funciones
 
 int calcular(char hexa[5]);
-int calcularVelocidad(int frecuencia);
+float calcularVelocidad(int frecuencia);
 
 #endif
