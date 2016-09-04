@@ -2,7 +2,7 @@
 #include <netinet/in.h> //htons()
 #include <stdlib.h> //atoi()
 
-
+#include "time.h"
 #include "client.h"
 #include "file.h"
 #include "calculateTemp.h"
@@ -11,12 +11,14 @@
 //   1      2   3    4    5        6   7
 int client(int argc, char* argv[]){
   int n = 0;
-  int cantidadDeArgumentos = 8;
+  int cantArguments = 8;
   unsigned short int buffer;
   char hexa[5];
+  int timeArray[3]; //aca se guarda la hora,minuto y segundo
+
   //comprobar cant parametros
-  if (cantidadDeArgumentos != argc){
-    printf("Tengo %d argumentos y espero %d argumentos\n",argc,cantidadDeArgumentos);
+  if (cantArguments != argc){
+    printf("Tengo %d argumentos y espero %d argumentos\n",argc,cantArguments);
     return 1;
   }
   printf("Se entró correctamente a client y la cantidad de parametros ok\n");
@@ -37,7 +39,9 @@ int client(int argc, char* argv[]){
   //printf("La cantidad de mediciones es:%d\n",n);
   //printf("La frecuencia es:%s\n",argv[7]);
   int frecuencia = atoi(argv[5]);
-  //printf("La cantidad de mediciones por segundos:%d\n",calcularVelocidad(frecuencia));
+  printf("La velocidad es:%d\n",calcularVelocidad(frecuencia));
+  printf("El tiempo es %s\n",argv[6]);
+  getHrMinSec(argv[6],&timeArray);
   file_close(file);
   return 0;
 }
