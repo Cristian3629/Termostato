@@ -8,9 +8,9 @@
 
 // {año,mes,dia,hora,minutos,segundos}
 //   0   1   2   3      4       5
-void printTime(int (*lista)[6]){
-    printf("%d.%d.%d-%02d:%02d:00 - ",(*lista)[0],(*lista)[1],(*lista)[2],(*lista)[3],
-  (*lista)[4]);
+void printTime(int (*list)[6]){
+    printf("%d.%d.%d-%02d:%02d:00 - ",(*list)[0],(*list)[1],(*list)[2],
+    (*list)[3],(*list)[4]);
   }
 
 int getHrMinSec(char* hora,int (*lista)[6]){

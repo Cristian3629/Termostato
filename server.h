@@ -2,9 +2,10 @@
 #define SERVER_H
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <string.h> //srtlen()
+
 
 #include "aceptador.h"
 #include "conectador.h"

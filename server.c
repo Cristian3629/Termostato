@@ -22,6 +22,12 @@ int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
 }
 
 
+int receive_time(conectador_t* canal,char* time_char){
+	printf("El time_char ocupa:%d\n",(int)sizeof(*time_char));
+	socket_conectador_receive(canal,time_char,19);
+	return 0;
+}
+
 int server_free_memory(conectador_t *conect,aceptador_t* acept){
 	socket_conectador_close(conect);
 	socket_acept_close(acept);
@@ -40,10 +46,13 @@ int server(int argc,char* argv[]){
 		printf("No pude conectarme con el cliente\n");
 		return -1;
 	}
-  //recibo la longitud de la cadena del archivo
+  //recibo el id del termostato
   char id_termostato[6] = "";
 	socket_conectador_receive(canal,id_termostato,6);
   printf("Recibiendo termostato. ID=%s\n", id_termostato);
+	char time_char[19] = "";
+	receive_time(canal,time_char);
+	printf("El tiempo es:%s\n", time_char);
 	server_free_memory(canal,aceptador);
   return 1;
 }

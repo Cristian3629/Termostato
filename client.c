@@ -26,13 +26,21 @@ int obtenterTemperatura(file_t* file, char temperatura[5]){
   char hexa[5] = "";
   unsigned short int buffer = 0;
   int cantidadBytes = file_read(file,&buffer);
-  //printf("Cantidad de bytes leidos:%d\n",cantidadBytes);
   buffer = htons(buffer);
   snprintf(hexa,sizeof(hexa),"%04X",buffer);
   calcular(hexa,temperatura);
   return cantidadBytes;
 }
 
+//esta funcion se encarga de enviar todos los datos respecto al tiempo
+int send_time(conectador_t* conectador,int (*list)[6]){
+  char time_char[19] = "";
+  snprintf(time_char,19,"%d.%d.%d-%d:%d:00",
+  (*list)[0],(*list)[1],(*list)[2],(*list)[3],(*list)[4]);
+  printf("time_char:%s\n",time_char);
+  socket_conectador_send(conectador,time_char,strlen(time_char));
+  return 0;
+}
 
 int client_free_memory(file_t* file, conectador_t *conect){
 	socket_conectador_close(conect);
@@ -57,9 +65,6 @@ int client(int argc, char* argv[]){
   // conectandome con el servidor
   conectador_t* conectador = client_create(argv[2],argv[3]);
   //envio mi nombre
-  printf("El id del termostato es:%s\n",argv[4]);
-  printf("La longitud de el id:%d\n", (int)strlen(argv[4]));
-  printf("La palabra ocupa:%d\n",(int)sizeof(*(argv[4])));
   socket_conectador_send(conectador,argv[4],6);
   //Lectura
   file_t* file = file_open(argv[7],"rb");
@@ -70,14 +75,13 @@ int client(int argc, char* argv[]){
 
   //parseo la hora y lo guardo en el array
   getHrMinSec(argv[6],&timeArray);
+  send_time(conectador,&timeArray);
   int cantidad;
   int n = 0; //es el contador de datos que se enviaron
 
-
-
   printTime(&timeArray);
   cantidad = getQuantity(timeArray[5],velocidad);
-  while(obtenterTemperatura(file,charTemperatura)){
+  while (obtenterTemperatura(file,charTemperatura)){
     //envio la temperatura al socket
     n++;
     if (n == cantidad){
@@ -87,8 +91,7 @@ int client(int argc, char* argv[]){
       printTime(&timeArray); //esto es para el proximo envio
       n = 0; //reinicio el contador;
       cantidad = getQuantity(timeArray[5],velocidad);
-    }
-    else{
+    }else{
       //envio un espacio;
     }
   }
