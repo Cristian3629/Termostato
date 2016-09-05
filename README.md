@@ -22,5 +22,6 @@
       ingresados, este decide si el programa se ejecutará en
       modo cliente o en modo servidor.
 
-- ### Cliente.c
-      Modeloa
+- ### cliente.c
+      Este es el modulo que modela todo el comportamiento del cliente, envia
+      la fecha como la hora y las mediciones capturadas.
