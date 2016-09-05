@@ -33,18 +33,18 @@ int obtenterTemperatura(file_t* file, char temperatura[5]){
 }
 
 //esta funcion se encarga de enviar todos los datos respecto al tiempo
-int send_time(conectador_t* conectador,int (*list)[6]){
-  char time_char[19] = "";
-  snprintf(time_char,19,"%d.%d.%d-%d:%d:00",
+int send_time(conectador_t* conectador,int (*list)[6],char* time_char,int cant){
+  snprintf(time_char,cant,"%d.%d.%d-%d:%d:00",
   (*list)[0],(*list)[1],(*list)[2],(*list)[3],(*list)[4]);
   printf("time_char:%s\n",time_char);
-  socket_conectador_send(conectador,time_char,strlen(time_char));
+  socket_conectador_send(conectador,time_char,cant);
   return 0;
 }
 
-int client_free_memory(file_t* file, conectador_t *conect){
+int client_free_memory(file_t* file, conectador_t *conect,char* date){
 	socket_conectador_close(conect);
 	file_close(file);
+  free(date);
 	return 0;
 }
 
@@ -75,7 +75,11 @@ int client(int argc, char* argv[]){
 
   //parseo la hora y lo guardo en el array
   getHrMinSec(argv[6],&timeArray);
-  send_time(conectador,&timeArray);
+
+  //envio la fecha y hora
+  int long_format_time = 19;
+	char* time_char = malloc(sizeof(char)*long_format_time);
+  send_time(conectador,&timeArray,time_char,long_format_time);
   int cantidad;
   int n = 0; //es el contador de datos que se enviaron
 
@@ -98,7 +102,7 @@ int client(int argc, char* argv[]){
   printf("Enviando %d muestras\n",n);
 
   //cierro conexion
-  client_free_memory(file,conectador);
+  client_free_memory(file,conectador,time_char);
 
 
   return 0;

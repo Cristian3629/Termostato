@@ -22,15 +22,17 @@ int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
 }
 
 
-int receive_time(conectador_t* canal,char* time_char){
-	printf("El time_char ocupa:%d\n",(int)sizeof(*time_char));
-	socket_conectador_receive(canal,time_char,19);
+int receive_time(conectador_t* canal,char* time_char,int largo){
+	//printf("El time_char ocupa:%d\n",(int)sizeof(*time_char));
+	//printf("El largo es:%d\n",(int)strlen(time_char));
+	socket_conectador_receive(canal,time_char,largo);
 	return 0;
 }
 
-int server_free_memory(conectador_t *conect,aceptador_t* acept){
+int server_free_memory(conectador_t *conect,aceptador_t* acept,char* hour){
 	socket_conectador_close(conect);
 	socket_acept_close(acept);
+	free(hour);
 	return 0;
 }
 
@@ -50,9 +52,11 @@ int server(int argc,char* argv[]){
   char id_termostato[6] = "";
 	socket_conectador_receive(canal,id_termostato,6);
   printf("Recibiendo termostato. ID=%s\n", id_termostato);
-	char time_char[19] = "";
-	receive_time(canal,time_char);
+	int long_format_time = 19;
+	char* time_char = malloc(sizeof(char)*long_format_time);
+	receive_time(canal,time_char,long_format_time);
 	printf("El tiempo es:%s\n", time_char);
-	server_free_memory(canal,aceptador);
+
+	server_free_memory(canal,aceptador,time_char);
   return 1;
 }
