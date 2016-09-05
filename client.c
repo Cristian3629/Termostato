@@ -22,21 +22,21 @@ int getQuantity(int segundos, float velocidad){
   return (int)(cantidad + 0.5);
 }
 
-int obtenterTemperatura(file_t* file, char temperatura[5]){
+int obtenterTemperatura(file_t* file, char temperatura[5], int largo){
   char hexa[5] = "";
   unsigned short int buffer = 0;
   int cantidadBytes = file_read(file,&buffer);
   buffer = htons(buffer);
   snprintf(hexa,sizeof(hexa),"%04X",buffer);
-  calcular(hexa,temperatura);
+  calcular(hexa,temperatura,largo);
   return cantidadBytes;
 }
 
 //esta funcion se encarga de enviar todos los datos respecto al tiempo
 int send_time(conectador_t* conectador,int (*list)[6],char* time_char,int cant){
-  snprintf(time_char,cant,"%d.%d.%d-%d:%d:00",
+  snprintf(time_char,cant,"%d.%d.%d-%02d:%02d:00",
   (*list)[0],(*list)[1],(*list)[2],(*list)[3],(*list)[4]);
-  printf("time_char:%s\n",time_char);
+  //printf("time_char:%s\n",time_char);
   socket_conectador_send(conectador,time_char,cant);
   return 0;
 }
@@ -49,12 +49,14 @@ int client_free_memory(file_t* file, conectador_t *conect,char* date){
 }
 
 
+//--------------------------FUNCION PRINCIPAL----------------------------
+
 //tp client ip port id frencuencia time file
 //   1      2   3    4    5        6   7
 int client(int argc, char* argv[]){
   int cantArguments = 8;
   int timeArray[6]; //aca se guarda la hora,minuto y segundo
-  char charTemperatura[5]; //aca se guarda el temperatura
+  char charTemperatura[6]; //aca se guarda el temperatura
   //comprobar cant parametros
   if (cantArguments != argc){
     printf("Tengo %d argumentos y espero %d argumentos\n",argc,cantArguments);
@@ -79,20 +81,27 @@ int client(int argc, char* argv[]){
   //envio la fecha y hora
   int long_format_time = 19;
 	char* time_char = malloc(sizeof(char)*long_format_time);
-  send_time(conectador,&timeArray,time_char,long_format_time);
+
+
+
+
+  int char_tem_long = 6;
   int cantidad;
   int n = 0; //es el contador de datos que se enviaron
 
   printTime(&timeArray);
+  send_time(conectador,&timeArray,time_char,long_format_time);
   cantidad = getQuantity(timeArray[5],velocidad);
-  while (obtenterTemperatura(file,charTemperatura)){
-    //envio la temperatura al socket
+  while (obtenterTemperatura(file,charTemperatura,char_tem_long)){
+    printf("el largo es:%d\n",(int)strlen(charTemperatura));
+    printf("La temperatura es:%s\n",charTemperatura);
     n++;
     if (n == cantidad){
       //tengo que enviar un barra n
       printf("Enviando %d muestras\n",n);
       wait(&timeArray);
       printTime(&timeArray); //esto es para el proximo envio
+      send_time(conectador,&timeArray,time_char,long_format_time);
       n = 0; //reinicio el contador;
       cantidad = getQuantity(timeArray[5],velocidad);
     }else{

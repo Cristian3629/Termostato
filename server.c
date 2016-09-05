@@ -21,12 +21,9 @@ int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
 	return 1;
 }
 
-
+//la funcion receive devuelve -1 cuando la conexion se cierra
 int receive_time(conectador_t* canal,char* time_char,int largo){
-	//printf("El time_char ocupa:%d\n",(int)sizeof(*time_char));
-	//printf("El largo es:%d\n",(int)strlen(time_char));
-	socket_conectador_receive(canal,time_char,largo);
-	return 0;
+	return socket_conectador_receive(canal,time_char,largo);
 }
 
 int server_free_memory(conectador_t *conect,aceptador_t* acept,char* hour){
@@ -52,10 +49,17 @@ int server(int argc,char* argv[]){
   char id_termostato[6] = "";
 	socket_conectador_receive(canal,id_termostato,6);
   printf("Recibiendo termostato. ID=%s\n", id_termostato);
+
 	int long_format_time = 19;
 	char* time_char = malloc(sizeof(char)*long_format_time);
-	receive_time(canal,time_char,long_format_time);
-	printf("El tiempo es:%s\n", time_char);
+
+	//recibo el date junto con las mediciones
+	while (receive_time(canal,time_char,long_format_time) != -1) {
+		printf("%s - \n", time_char);
+	}
+	printf("Termostato desconectado. ID=%s\n", id_termostato);
+
+
 
 	server_free_memory(canal,aceptador,time_char);
   return 1;

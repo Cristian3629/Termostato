@@ -53,10 +53,11 @@ float validarTemperatura(float anterior, float actual){
 
 
 
-int calcular(char hexa[5],char temp[5]){
+int calcular(char hexa[5],char temp[5],int largo){
   int num = conversionHexDec(hexa);
   //printf("El num entero:%d ",num);
   float numTrans = tranformar(num);
-  snprintf(temp,sizeof(*temp),"%.2f",numTrans);
+  printf("float:%f\n", numTrans);
+  snprintf(temp,largo,"%.2f",numTrans);
   return 0;
 }

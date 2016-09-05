@@ -5,7 +5,7 @@
 
 //Funciones
 
-int calcular(char hexa[5],char temperatura[5]);
+int calcular(char hexa[5],char temperatura[5],int largo);
 float calcularVelocidad(int frecuencia);
 
 #endif
