@@ -78,37 +78,48 @@ int client(int argc, char* argv[]){
   //parseo la hora y lo guardo en el array
   getHrMinSec(argv[6],&timeArray);
 
-  //envio la fecha y hora
+  //variables para el envio la fecha y hora
   int long_format_time = 19;
 	char* time_char = malloc(sizeof(char)*long_format_time);
-
-
-
 
   int char_tem_long = 6;
   int cantidad;
   int n = 0; //es el contador de datos que se enviaron
+  char espacio[] = " "; //se utiliza para indicar que hay datos por enviar
+  char barraN[] = "\n"; //se utiliza para indicar que ya no hay datos
+  int long_identificador = 1;
+  int hayMediciones; //es para indicar si hay mediciones disponibles
 
   printTime(&timeArray);
+  //envio el date
   send_time(conectador,&timeArray,time_char,long_format_time);
+  //calculo cantidad de datos a enviar
   cantidad = getQuantity(timeArray[5],velocidad);
-  while (obtenterTemperatura(file,charTemperatura,char_tem_long)){
-    printf("el largo es:%d\n",(int)strlen(charTemperatura));
-    printf("La temperatura es:%s\n",charTemperatura);
+  hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
+  while (hayMediciones){
+    printf("%s",charTemperatura);
+    socket_conectador_send(conectador,charTemperatura,char_tem_long);
     n++;
-    if (n == cantidad){
-      //tengo que enviar un barra n
+    //si ya envie la cantidad correspondiente
+    hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
+    if (n == cantidad || !hayMediciones){
+      socket_conectador_send(conectador,barraN,long_identificador);
+      printf("%s",barraN);
       printf("Enviando %d muestras\n",n);
       wait(&timeArray);
-      printTime(&timeArray); //esto es para el proximo envio
-      send_time(conectador,&timeArray,time_char,long_format_time);
+      if (hayMediciones){
+        printTime(&timeArray); //esto es para el proximo envio
+        send_time(conectador,&timeArray,time_char,long_format_time);
+      }
       n = 0; //reinicio el contador;
       cantidad = getQuantity(timeArray[5],velocidad);
     }else{
-      //envio un espacio;
+      printf("%s",espacio);
+      socket_conectador_send(conectador,espacio,long_identificador);
     }
   }
-  printf("Enviando %d muestras\n",n);
+  socket_conectador_send(conectador,barraN,long_identificador);
+  //printf("Enviando %d muestras\n",n);
 
   //cierro conexion
   client_free_memory(file,conectador,time_char);

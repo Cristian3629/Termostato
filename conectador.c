@@ -67,12 +67,12 @@ int socket_conectador_receive(conectador_t *conect, void *buffer,int longitud){
 		aux = recv(conect->descriptor_file, buffer,longitud-leido, MSG_NOSIGNAL);
 		if (aux > 0) {
 			leido += aux;
-		}else {
+		}else{
 			if (aux < 0) {
 				printf("Error al leer\n");
 				return -1; //por ahora mando sólo -1, después voy a identicar los errores
 			}else{
-				printf("Socket cerrado\n");
+				printf("Socket cerrado y envio -1\n");
 				return -1;
 			}
 		}
