@@ -9,6 +9,8 @@
 
 #include "aceptador.h"
 #include "conectador.h"
+#include "time.h"
+#include "lista.h"
 
 int server(int argc, char *argv[]);
 

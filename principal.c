@@ -11,14 +11,14 @@ int main(int argc, char *argv[]){
   //int n = 0;
   //unsigned short int buffer;
   //char hexa[5];
-  char algo[3] = "AB";
-  printf("La cantidad de bytes que ocupa algo es:%d\n",(int)sizeof(algo));
+  //char algo[3] = "AB";
+  //printf("La cantidad de bytes que ocupa algo es:%d\n",(int)sizeof(algo));
   if (strcmp(argv[1],"client") == 0){
-    printf("Hola soy un cliente\n");
+    //printf("Hola soy un cliente\n");
     client(argc,argv);
   }
 	if (strcmp(argv[1],"server") == 0){
-    printf("Hola soy un servidor\n");
+    //printf("Hola soy un servidor\n");
     server(argc,argv);
   }
   //file_t* file = file_open("values.dat","rb");

@@ -2,8 +2,8 @@
 
 
 conectador_t* client_create(char *ip,char *puerto){
-  printf("cliente_create\n");
-  printf("ip:%s port:%s\n",ip,puerto);
+  //printf("cliente_create\n");
+  //printf("ip:%s port:%s\n",ip,puerto);
 	conectador_t *self = socket_conectador_create();
 	int port = atoi(puerto);
   printf("el int del puerto es:%d\n",port);
@@ -34,7 +34,7 @@ int obtenterTemperatura(file_t* file, char temperatura[5], int largo){
 
 //esta funcion se encarga de enviar todos los datos respecto al tiempo
 int send_time(conectador_t* conectador,int (*list)[6],char* time_char,int cant){
-  snprintf(time_char,cant,"%d.%d.%d-%02d:%02d:00",
+  snprintf(time_char,cant,"%d.%02d.%d-%02d:%02d:00",
   (*list)[0],(*list)[1],(*list)[2],(*list)[3],(*list)[4]);
   //printf("time_char:%s\n",time_char);
   socket_conectador_send(conectador,time_char,cant);
@@ -62,7 +62,7 @@ int client(int argc, char* argv[]){
     printf("Tengo %d argumentos y espero %d argumentos\n",argc,cantArguments);
     return 1;
   }
-  printf("Se entró correctamente a client y la cantidad de parametros ok\n");
+  //printf("Se entró correctamente a client y la cantidad de parametros ok\n");
 
   // conectandome con el servidor
   conectador_t* conectador = client_create(argv[2],argv[3]);
@@ -79,7 +79,7 @@ int client(int argc, char* argv[]){
   getHrMinSec(argv[6],&timeArray);
 
   //variables para el envio la fecha y hora
-  int long_format_time = 19;
+  int long_format_time = 20;
 	char* time_char = malloc(sizeof(char)*long_format_time);
 
   int char_tem_long = 6;

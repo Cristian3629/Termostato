@@ -72,7 +72,7 @@ int socket_conectador_receive(conectador_t *conect, void *buffer,int longitud){
 				printf("Error al leer\n");
 				return -1; //por ahora mando sólo -1, después voy a identicar los errores
 			}else{
-				printf("Socket cerrado y envio -1\n");
+				//printf("Socket cerrado y envio -1\n");
 				return -1;
 			}
 		}

@@ -1,5 +1,58 @@
 #include "server.h"
 
+//calcula el máximo de las temperaturas
+void getMax(float* maxActual,float* num){
+	if ((*num) > (*maxActual)){
+		*maxActual = *num;
+	}
+}
+
+//actualiza el mínimo de las temperaturas
+void getMin(float* minActual, float* num){
+	if((*num)<(*minActual)){
+		*minActual = *num;
+	}
+}
+
+//actualiza la sumatoria de todas las temperaturas
+void refreshSum(float* sumatoria,float* num){
+	*sumatoria = *sumatoria + *num;
+}
+
+float getFloat(char* charFloat){
+	return atof(charFloat);
+}
+
+
+void formatParamaters(float* max,float* min,lista_t* list,int *cantidad){
+	*max = -18.0;
+	*min = 60.0;
+	while(!lista_esta_vacia(list)){
+		lista_borrar_primero(list);
+	}
+	//printf("formatParamaters");
+	//printList(list);
+	*cantidad = 0;
+}
+
+void printInfo(int (*list)[6],char* id,float* max,float* min,lista_t* lista,
+int* cantidadPorDia){
+	//int posicionMedio = getLargo(lista)/2;
+	//printf("La posicion media es:%d\n",posicionMedio);
+	float mediana = lista_posicion(lista,getLargo(lista)/2);
+	printf("%d.%02d.%02d %s Max=%.1f Min=%.1f Mediana=%.1f Muestras=%d\n",
+	(*list)[0],(*list)[1],(*list)[2]-1,id,*max,*min,mediana,*cantidadPorDia);
+	//printf("Imprimi la lista\n");
+	//printList(lista);
+	formatParamaters(max,min,lista,cantidadPorDia);
+}
+
+
+
+int detectChangeDay(char* dateTime, int (*lista)[6]){
+	getHrMinSec(dateTime,lista);
+	return (*lista)[3] == 0 && (*lista)[4]==0;
+}
 
 int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
 	int cant_client = 10;
@@ -24,7 +77,7 @@ int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
 //la funcion receive devuelve -1 cuando la conexion se cierra
 int receive_time(conectador_t* canal,char* time_char,int largo){
 	int resultado = socket_conectador_receive(canal,time_char,largo);
-	printf("resultado de receive_time:%d\n",resultado);
+	//printf("resultado de receive_time:%d\n",resultado);
 	return resultado;
 }
 
@@ -53,41 +106,57 @@ int server(int argc,char* argv[]){
   printf("Recibiendo termostato. ID=%s\n", id_termostato);
 
 	//variables para el tiempo
-	int long_format_time = 19;
+	int long_format_time = 20;
 	char* time_char = malloc(sizeof(char)*long_format_time);
 
 
 	//variables para la temperatura
-	int cantidad = 0;
+
 	int long_format_temp = 6;
 	char* temp_char = malloc(sizeof(char)*long_format_temp);
 	int long_format_ident = 1;
 	char* identificador = malloc(sizeof(char)*long_format_ident);
 
-
+	//variables para la información a mostrar
+	float max = -18.0;
+	float min = 60.0;
+	lista_t* lista = lista_crear();
+	int cantidadPorMinuto = 0;
+	int cantidadPorDia = 0;
+	int arrayTime[6]; //aca voy guardado el date
+	float number;
 	//recibo el date junto con las mediciones
 	while (receive_time(canal,time_char,long_format_time) != -1){
-		printf("%s - ", time_char);
+		fprintf(stderr, "%s - ",time_char);
+		//printf("%s - ", time_char);
+		if (detectChangeDay(time_char,&arrayTime)){
+			//printf("Hay cambio de dia\n");
+			printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia);
+		}
 		strncpy(identificador," ",long_format_ident);
 		while (strncmp(identificador," ",long_format_ident) == 0) {
 			socket_conectador_receive(canal,temp_char,long_format_temp);
-			//recibo la temperatura
-			cantidad++;
-			printf("%s", temp_char);
-			//printf("%s",identificador);
-			printf(" ");
-			//recibo el identificador
+			number = getFloat(temp_char);
+			//printf("El numero flotante es:%f-", number);
+			getMin(&min,&number);
+			getMax(&max,&number);
+			lista_insertar(lista,number);
+			cantidadPorMinuto++;
+			cantidadPorDia++;
 			socket_conectador_receive(canal,identificador,long_format_ident);
 		}
-		printf("\n");
+		//printf("");
 		//printf("%s",identificador);
-		printf("Datos recibidos: %d ",cantidad);
-		cantidad = 0;
+		fprintf(stderr,"Datos recibidos: %d\n",cantidadPorMinuto);
+		//printf(,cantidadPorMinuto);
+		cantidadPorMinuto = 0;
 	}
+	//refreshSum(&sumatoria,&number);
+	printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia);
 	printf("Termostato desconectado. ID=%s\n", id_termostato);
 	free(identificador);
 	free(temp_char);
-
+	lista_destruir(lista);
 
 	server_free_memory(canal,aceptador,time_char);
   return 1;
