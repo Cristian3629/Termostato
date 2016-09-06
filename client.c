@@ -6,7 +6,7 @@ conectador_t* client_create(char *ip,char *puerto){
   //printf("ip:%s port:%s\n",ip,puerto);
 	conectador_t *self = socket_conectador_create();
 	int port = atoi(puerto);
-  printf("el int del puerto es:%d\n",port);
+  //printf("el int del puerto es:%d\n",port);
 	int aux = socket_conectador_connect(self,ip,port);
 	if (aux == -1){
 		printf("Error al conectar con el server\n");
@@ -97,15 +97,15 @@ int client(int argc, char* argv[]){
   cantidad = getQuantity(timeArray[5],velocidad);
   hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
   while (hayMediciones){
-    printf("%s",charTemperatura);
+    //fprintf(stderr,"%s",charTemperatura);
     socket_conectador_send(conectador,charTemperatura,char_tem_long);
     n++;
     //si ya envie la cantidad correspondiente
     hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
     if (n == cantidad || !hayMediciones){
       socket_conectador_send(conectador,barraN,long_identificador);
-      printf("%s",barraN);
-      printf("Enviando %d muestras\n",n);
+      //fprintf(stderr,"%s",barraN);
+      fprintf(stderr,"Enviando %d muestras\n",n);
       wait(&timeArray);
       if (hayMediciones){
         printTime(&timeArray); //esto es para el proximo envio
@@ -114,7 +114,7 @@ int client(int argc, char* argv[]){
       n = 0; //reinicio el contador;
       cantidad = getQuantity(timeArray[5],velocidad);
     }else{
-      printf("%s",espacio);
+      //fprintf(stderr,"%s",espacio);
       socket_conectador_send(conectador,espacio,long_identificador);
     }
   }

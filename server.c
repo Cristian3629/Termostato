@@ -36,12 +36,12 @@ void formatParamaters(float* max,float* min,lista_t* list,int *cantidad){
 }
 
 void printInfo(int (*list)[6],char* id,float* max,float* min,lista_t* lista,
-int* cantidadPorDia){
+int* cantidadPorDia, int resta){
 	//int posicionMedio = getLargo(lista)/2;
 	//printf("La posicion media es:%d\n",posicionMedio);
 	float mediana = lista_posicion(lista,getLargo(lista)/2);
 	printf("%d.%02d.%02d %s Max=%.1f Min=%.1f Mediana=%.1f Muestras=%d\n",
-	(*list)[0],(*list)[1],(*list)[2]-1,id,*max,*min,mediana,*cantidadPorDia);
+	(*list)[0],(*list)[1],(*list)[2]-resta,id,*max,*min,mediana,*cantidadPorDia);
 	//printf("Imprimi la lista\n");
 	//printList(lista);
 	formatParamaters(max,min,lista,cantidadPorDia);
@@ -103,7 +103,7 @@ int server(int argc,char* argv[]){
   //recibo el id del termostato
   char id_termostato[6] = "";
 	socket_conectador_receive(canal,id_termostato,6);
-  printf("Recibiendo termostato. ID=%s\n", id_termostato);
+  fprintf(stderr,"Recibiendo termostato. ID=%s\n", id_termostato);
 
 	//variables para el tiempo
 	int long_format_time = 20;
@@ -130,8 +130,8 @@ int server(int argc,char* argv[]){
 		fprintf(stderr, "%s - ",time_char);
 		//printf("%s - ", time_char);
 		if (detectChangeDay(time_char,&arrayTime)){
-			//printf("Hay cambio de dia\n");
-			printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia);
+			printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia,1);
+
 		}
 		strncpy(identificador," ",long_format_ident);
 		while (strncmp(identificador," ",long_format_ident) == 0) {
@@ -152,8 +152,8 @@ int server(int argc,char* argv[]){
 		cantidadPorMinuto = 0;
 	}
 	//refreshSum(&sumatoria,&number);
-	printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia);
-	printf("Termostato desconectado. ID=%s\n", id_termostato);
+	printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia,0);
+	fprintf(stderr,"Termostato desconectado. ID=%s\n", id_termostato);
 	free(identificador);
 	free(temp_char);
 	lista_destruir(lista);
