@@ -1,1 +1,9 @@
 \select@language {spanish}
+\contentsline {section}{\numberline {1}Archivos}{2}
+\contentsline {subsection}{\numberline {1.1}File.c}{2}
+\contentsline {subsection}{\numberline {1.2}Time.c}{2}
+\contentsline {subsection}{\numberline {1.3}CalculateTemp.c}{2}
+\contentsline {subsection}{\numberline {1.4}Principal.c}{2}
+\contentsline {subsection}{\numberline {1.5}Cliente.c}{2}
+\contentsline {subsection}{\numberline {1.6}Lista.c y Nodo.c}{2}
+\contentsline {section}{\numberline {2}Aclaraciones}{2}

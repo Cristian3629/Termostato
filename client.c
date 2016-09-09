@@ -1,6 +1,5 @@
 #include "client.h"
 
-
 conectador_t* client_create(char *ip,char *puerto){
   //printf("cliente_create\n");
   //printf("ip:%s port:%s\n",ip,puerto);
@@ -34,11 +33,16 @@ int obtenterTemperatura(file_t* file, char temperatura[5], int largo){
 
 //esta funcion se encarga de enviar todos los datos respecto al tiempo
 int send_time(conectador_t* conectador,int (*list)[6],char* time_char,int cant){
-  snprintf(time_char,cant,"%d.%02d.%d-%02d:%02d:00",
+  snprintf(time_char,cant,"%d.%02d.%02d-%02d:%02d:00",
   (*list)[0],(*list)[1],(*list)[2],(*list)[3],(*list)[4]);
   //printf("time_char:%s\n",time_char);
   socket_conectador_send(conectador,time_char,cant);
   return 0;
+}
+
+int validarTemperatura(char* charMedicion){
+	float medicion = atof(charMedicion);
+	return (medicion > -17.0 || medicion < 59.7);
 }
 
 int client_free_memory(file_t* file, conectador_t *conect,char* date){
@@ -56,19 +60,21 @@ int client_free_memory(file_t* file, conectador_t *conect,char* date){
 int client(int argc, char* argv[]){
   int cantArguments = 8;
   int timeArray[6]; //aca se guarda la hora,minuto y segundo
-  char charTemperatura[6]; //aca se guarda el temperatura
+	char charAnterior[6] = "0.0";
+  char charTemperatura[6] = ""; //aca se guarda el temperatura
   //comprobar cant parametros
   if (cantArguments != argc){
     printf("Tengo %d argumentos y espero %d argumentos\n",argc,cantArguments);
     return 1;
   }
-  //printf("Se entró correctamente a client y la cantidad de parametros ok\n");
 
   // conectandome con el servidor
   conectador_t* conectador = client_create(argv[2],argv[3]);
+
   //envio mi nombre
-  socket_conectador_send(conectador,argv[4],6);
-  //Lectura
+  socket_conectador_send(conectador,argv[4],7);
+
+	//Lectura
   file_t* file = file_open(argv[7],"rb");
 
   //la velocidad es mediciones por segundo
@@ -97,8 +103,14 @@ int client(int argc, char* argv[]){
   cantidad = getQuantity(timeArray[5],velocidad);
   hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
   while (hayMediciones){
-    //fprintf(stderr,"%s",charTemperatura);
-    socket_conectador_send(conectador,charTemperatura,char_tem_long);
+		if (!validarTemperatura(charTemperatura)){
+			printf("Esta temperatura %s no es valida se envia %s\n",charTemperatura,charAnterior);
+			socket_conectador_send(conectador,charAnterior,char_tem_long);
+		}else{
+			printf("Temperatura valida %s\n",charTemperatura);
+			socket_conectador_send(conectador,charTemperatura,char_tem_long);
+			strncpy(charAnterior,charTemperatura,6);
+		}
     n++;
     //si ya envie la cantidad correspondiente
     hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);

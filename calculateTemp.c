@@ -43,16 +43,6 @@ int conversionHexDec(char* hexadecimal) {
     return numDecimal;
 }
 
-float validarTemperatura(float anterior, float actual){
-  if ((actual > -17.00) &&  (actual < 59.70)){
-    return actual;
-  }else{
-    return anterior;
-  }
-}
-
-
-
 int calcular(char hexa[5],char temp[5],int largo){
   int num = conversionHexDec(hexa);
   //printf("El num entero:%d ",num);

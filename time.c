@@ -9,8 +9,8 @@
 // {año,mes,dia,hora,minutos,segundos}
 //   0   1   2   3      4       5
 void printTime(int (*list)[6]){
-    fprintf(stderr,"%d.%02d.%02d-%02d:%02d:00 - ",(*list)[0],(*list)[1],(*list)[2],
-    (*list)[3],(*list)[4]);
+    fprintf(stderr,"%d.%02d.%02d-%02d:%02d:00 - ",(*list)[0],(*list)[1],
+    (*list)[2],(*list)[3],(*list)[4]);
   }
 
 int getHrMinSec(char* hora,int (*lista)[6]){
@@ -28,8 +28,8 @@ int getHrMinSec(char* hora,int (*lista)[6]){
 
 int incrementMinute(int (*lista)[6]){
   //printf("(*lista)[4]:%d\n",(*lista)[4]);
-  if ((*lista)[4] < 59 ){
-    (*lista)[4] = (*lista)[4] + 1 ;
+  if ( (*lista)[4] < 59 ){
+    (*lista)[4] = (*lista)[4] + 1;
     return 1;
   }else{
     (*lista)[4] = 0;

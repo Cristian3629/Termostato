@@ -30,8 +30,6 @@ void formatParamaters(float* max,float* min,lista_t* list,int *cantidad){
 	while(!lista_esta_vacia(list)){
 		lista_borrar_primero(list);
 	}
-	//printf("formatParamaters");
-	//printList(list);
 	*cantidad = 0;
 }
 
@@ -44,6 +42,7 @@ int* cantidadPorDia, int resta){
 	(*list)[0],(*list)[1],(*list)[2]-resta,id,*max,*min,mediana,*cantidadPorDia);
 	//printf("Imprimi la lista\n");
 	//printList(lista);
+	//printf("largo de la lista:%d\n",getLargo(lista));
 	formatParamaters(max,min,lista,cantidadPorDia);
 }
 
@@ -101,8 +100,8 @@ int server(int argc,char* argv[]){
 		return -1;
 	}
   //recibo el id del termostato
-  char id_termostato[6] = "";
-	socket_conectador_receive(canal,id_termostato,6);
+  char id_termostato[7] = "";
+	socket_conectador_receive(canal,id_termostato,7);
   fprintf(stderr,"Recibiendo termostato. ID=%s\n", id_termostato);
 
 	//variables para el tiempo
@@ -131,7 +130,6 @@ int server(int argc,char* argv[]){
 		//printf("%s - ", time_char);
 		if (detectChangeDay(time_char,&arrayTime)){
 			printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia,1);
-
 		}
 		strncpy(identificador," ",long_format_ident);
 		while (strncmp(identificador," ",long_format_ident) == 0) {
