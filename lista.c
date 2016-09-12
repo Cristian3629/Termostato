@@ -89,7 +89,7 @@ bool lista_esta_vacia(const lista_t *lista){
 //devuelvo -1 o la posicion donde se encuentra el dato
 float lista_posicion(lista_t *lista,int posicion){
 	nodo_t *nodo_actual = lista->primero;
-	int posActual = 0;
+	int posActual = 1;
 	while (nodo_actual != NULL){
 		if (posicion == posActual){
 			return obtener_dato(nodo_actual);

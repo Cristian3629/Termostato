@@ -35,9 +35,21 @@ void formatParamaters(float* max,float* min,lista_t* list,int *cantidad){
 
 void printInfo(int (*list)[6],char* id,float* max,float* min,lista_t* lista,
 int* cantidadPorDia, int resta){
-	//int posicionMedio = getLargo(lista)/2;
-	//printf("La posicion media es:%d\n",posicionMedio);
-	float mediana = lista_posicion(lista,getLargo(lista)/2);
+	float mediana;
+	if (getLargo(lista) % 2 == 0){
+		//printf("El largo es:%d\n",getLargo(lista));
+		//printf("getLargo(lista)/2 :%d\n",getLargo(lista)/2);
+		//printf("getLargo(lista)/2 + 1:%d\n",(getLargo(lista)/2) + 1);
+		//printf("Pos1:%d pos2:%d\n",getLargo(lista)/2,(getLargo(lista))/2 +1);
+		float valor1 = lista_posicion(lista,getLargo(lista)/2);
+		float valor2 = lista_posicion(lista,(getLargo(lista)/2) + 1);
+		//printf("Los valores son:%f y %f\n",valor1,valor2 );
+		mediana = (valor1 + valor2)/2;
+		mediana = mediana - 0.01;
+	}else{
+		mediana = lista_posicion(lista,getLargo(lista)/2 + 1);
+	}
+	//printf("Mediana:%f\n", mediana);
 	printf("%d.%02d.%02d %s Max=%.1f Min=%.1f Mediana=%.1f Muestras=%d\n",
 	(*list)[0],(*list)[1],(*list)[2]-resta,id,*max,*min,mediana,*cantidadPorDia);
 	//printf("Imprimi la lista\n");

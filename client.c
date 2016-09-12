@@ -104,10 +104,9 @@ int client(int argc, char* argv[]){
   hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
   while (hayMediciones){
 		if (!validarTemperatura(charTemperatura)){
-			printf("Esta temperatura %s no es valida se envia %s\n",charTemperatura,charAnterior);
 			socket_conectador_send(conectador,charAnterior,char_tem_long);
 		}else{
-			printf("Temperatura valida %s\n",charTemperatura);
+			//printf("Temperatura valida %s\n",charTemperatura);
 			socket_conectador_send(conectador,charTemperatura,char_tem_long);
 			strncpy(charAnterior,charTemperatura,6);
 		}
@@ -131,7 +130,6 @@ int client(int argc, char* argv[]){
     }
   }
   socket_conectador_send(conectador,barraN,long_identificador);
-  //printf("Enviando %d muestras\n",n);
 
   //cierro conexion
   client_free_memory(file,conectador,time_char);
