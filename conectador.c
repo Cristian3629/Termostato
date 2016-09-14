@@ -15,6 +15,10 @@ struct conectador{
 	int descriptor_file;
 };
 
+void error(const char *msg){
+    perror(msg);
+    exit(1);
+}
 
 conectador_t* socket_conectador_init(int descriptor){
 	conectador_t* conectador = malloc(sizeof(struct conectador));
@@ -25,16 +29,19 @@ conectador_t* socket_conectador_init(int descriptor){
 }
 
 conectador_t* socket_conectador_create(){
-	int descriptor_file_aux;
-	descriptor_file_aux = socket(AF_INET,SOCK_STREAM,0);
-	if (descriptor_file_aux == -1) {
+	int fd_aux;
+	fd_aux = socket(AF_INET,SOCK_STREAM,0);
+	if (fd_aux == -1) {
 		printf("Error crear socket\n");
 		return NULL;
 	}
-
+	int enable = 1;
+	if(setsockopt(fd_aux, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int))<0){
+		error("setsockopt(SO_REUSEADDR) failed");
+	}
 	conectador_t* conectador = malloc(sizeof(struct conectador));
 	if (conectador != NULL) {
-		conectador->descriptor_file = descriptor_file_aux;
+		conectador->descriptor_file = fd_aux;
 	}
 	return conectador;
 }
