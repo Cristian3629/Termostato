@@ -35,7 +35,7 @@ int client_get_temp(file_t* file, char temperatura[5], int largo){
   int cantidadBytes = file_read(file,&buffer);
   buffer = htons(buffer);
   snprintf(hexa,sizeof(hexa),"%04X",buffer);
-  calcular(hexa,temperatura,largo);
+  temperature_calculate(hexa,temperatura,largo);
   return cantidadBytes;
 }
 
@@ -93,7 +93,7 @@ int client(int argc, char* argv[]){
 
   //la velocidad es mediciones por segundo
   int frecuencia = atoi(argv[5]);
-  float velocidad = calcularVelocidad(frecuencia);
+  float velocidad = temperature_calculate_speed(frecuencia);
 
   //parseo la hora y lo guardo en date_t
 	date_t *date = date_create(argv[6]);

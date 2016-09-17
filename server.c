@@ -59,7 +59,7 @@ void server_print_info(date_t* date,char* id,float* max,float* min,
 
 
 
-int server_detect_change_day(date_t* date,char* dateTime){
+int server_detect_change_day(date_t* date){
 	int hour = date_get_hour(date);
 	int minute = date_get_minute(date);
 	return hour == 0 && minute == 0;
@@ -73,7 +73,7 @@ int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
 		printf(" no obtuve el aceptador\n");
 		return -1;}
 	*acep = acept_aux;
-	if(socket_acept_connect(acept_aux,port_aux ,cant_client,"127.0.0.1") == -1){
+	if(socket_acept_connect(acept_aux,port_aux ,cant_client) == -1){
 		printf(" no pude prepararme para conectarme\n");
 		socket_acept_close(acept_aux);
 		return -1;
@@ -91,10 +91,9 @@ int server_receive_time(conectador_t* canal,char* time_char,int largo){
 	return resultado;
 }
 
-int server_free_memory(conectador_t *conect,aceptador_t* acept,char* hour){
+int server_free_memory(conectador_t *conect,aceptador_t* acept){
 	socket_conectador_close(conect);
 	socket_acept_close(acept);
-	free(hour);
 	return 0;
 }
 
@@ -117,16 +116,18 @@ int server(int argc,char* argv[]){
 
 	//variables para el tiempo
 	int long_format_time = 20;
-	char* time_char = malloc(sizeof(char)*long_format_time);
-
+	//char* time_char = malloc(sizeof(char)*long_format_time);
+	char time_char[21] = "";
+	time_char[20] = '\0';
 
 	//variables para la temperatura
 
 	int long_format_temp = 6;
-	char* temp_char = malloc(sizeof(char)*long_format_temp);
+	char temp_char[7] = "";
+	temp_char[6] = '\0';
 	int long_format_ident = 1;
-	char* identificador = malloc(sizeof(char)*long_format_ident);
-
+	char identificador[2] = " ";
+	identificador[1] = '\0';
 	//variables para la información a mostrar
 	float max = -18.0;
 	float min = 60.0;
@@ -142,7 +143,7 @@ int server(int argc,char* argv[]){
 	while (server_receive_time(canal,time_char,long_format_time) != -1){
 		fprintf(stderr, "%s - ",time_char);
 		date_set(date,time_char);
-		if (server_detect_change_day(date,time_char)){
+		if (server_detect_change_day(date)){
 			server_print_info(date,id_termostato,&max,&min,lista,&cantidadPorDia,1);
 		}
 		strncpy(identificador," ",long_format_ident);
@@ -156,21 +157,14 @@ int server(int argc,char* argv[]){
 			cantidadPorDia++;
 			socket_conectador_receive(canal,identificador,long_format_ident);
 		}
-		//printf("");
-		//printf("%s",identificador);
 		fprintf(stderr,"Datos recibidos: %d\n",cantidadPorMinuto);
-		//printf(,cantidadPorMinuto);
 		cantidadPorMinuto = 0;
 	}
-	//refreshSum(&sumatoria,&number);
 	server_print_info(date,id_termostato,&max,&min,lista,&cantidadPorDia,0);
 	fprintf(stderr,"Termostato desconectado. ID=%s\n", id_termostato);
 
-	//optimizar
-	free(identificador);
-	free(temp_char);
 	lista_destruir(lista);
 	date_destroit(date);
-	server_free_memory(canal,aceptador,time_char);
+	server_free_memory(canal,aceptador);
   return 1;
 }
