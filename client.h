@@ -8,6 +8,7 @@
 #include <string.h> //srtlen()
 
 #include "time.h"
+#include "date.h"
 #include "client.h"
 #include "file.h"
 #include "calculateTemp.h"

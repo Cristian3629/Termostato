@@ -1,6 +1,8 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include <stdlib.h> //malloc()
+#include <stdio.h> //funciones de file
 
 typedef struct file file_t;
 

@@ -49,8 +49,8 @@ conectador_t* socket_conectador_create(){
 
 
 int socket_conectador_send(conectador_t *conectador, void *buffer,int longitud){
-	int aux = 0; // Guardaremos el valor devuelto por send() */
-	int leido = 0; // Número de caracteres leídos hasta el momento
+	size_t aux = 0; // Guardaremos el valor devuelto por send() */
+	size_t leido = 0; // Número de caracteres leídos hasta el momento
 	//aux es la cantidad de bytes que envie
 	//longitud es la longitud del buffer
 	while (leido < longitud){

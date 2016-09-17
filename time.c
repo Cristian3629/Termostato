@@ -1,6 +1,5 @@
 #include <stdio.h> //printf() sscanf()
 #include <time.h> //time()
-//#include <stdlib.h> //atoi()
 #include <unistd.h> //sleep()
 
 //Este módulo se encarga de obtener la hora y si los segundos son igual a 0

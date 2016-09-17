@@ -31,7 +31,8 @@ aceptador_t* socket_acept_create(){
 
 int socket_acept_connect(aceptador_t *acept, int port, int cant, char *ip){
 	struct sockaddr_in address;
-	inet_pton(AF_INET,"127.0.0.1", &(address.sin_addr));
+	//inet_pton(AF_INET,INADDR_ANY, &(address.sin_addr));
+	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = (unsigned long)port;
 	address.sin_family = AF_INET;
 

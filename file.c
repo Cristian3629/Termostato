@@ -1,6 +1,5 @@
 #include "file.h"
-#include <stdlib.h> //malloc()
-#include <stdio.h> //funciones de file
+
 
 struct file{
 	FILE* fd; //file descriptor

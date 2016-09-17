@@ -1,8 +1,11 @@
 #include "client.h"
 
+//Este archivo representa todo el comportamiento del cliente, desde leer
+//el archivo hasta enviar al server con cierta frecuencia las medidas tomadas
+
+//Pre:Recibe un direccion ip valida la igual con un puerto de formato valido
+//Post: Devuelve un conectador que se utilizara para comunicarse con el server
 conectador_t* client_create(char *ip,char *puerto){
-  //printf("cliente_create\n");
-  //printf("ip:%s port:%s\n",ip,puerto);
 	conectador_t *self = socket_conectador_create();
 	int port = atoi(puerto);
   //printf("el int del puerto es:%d\n",port);
@@ -15,13 +18,18 @@ conectador_t* client_create(char *ip,char *puerto){
 	return self;
 }
 
-int getQuantity(int segundos, float velocidad){
-  int diferencia = 60 - segundos;
+//Pre:Recibe cuantos segundos falta para el cambio de minuto y la frecuencia
+//Post:Devuelve la cantidad de datos a enviar en los segundos restantes
+int client_get_quantity(date_t* date, float velocidad){
+  int diferencia = 60 - date_get_second(date);
   float cantidad = velocidad*diferencia;
   return (int)(cantidad + 0.5);
 }
 
-int obtenterTemperatura(file_t* file, char temperatura[5], int largo){
+//Pre:El archivo se abrio de manera correcta, se recibe un temperatura en
+//decimal y el largo corresponde a...
+
+int client_get_temp(file_t* file, char temperatura[5], int largo){
   char hexa[5] = "";
   unsigned short int buffer = 0;
   int cantidadBytes = file_read(file,&buffer);
@@ -31,24 +39,29 @@ int obtenterTemperatura(file_t* file, char temperatura[5], int largo){
   return cantidadBytes;
 }
 
-//esta funcion se encarga de enviar todos los datos respecto al tiempo
-int send_time(conectador_t* conectador,int (*list)[6],char* time_char,int cant){
-  snprintf(time_char,cant,"%d.%02d.%02d-%02d:%02d:00",
-  (*list)[0],(*list)[1],(*list)[2],(*list)[3],(*list)[4]);
-  //printf("time_char:%s\n",time_char);
+//Pre:esta funcion se encarga de enviar todos los datos respecto al tiempo
+//correspondiente
+//Post:devuelve 0 si salio todo ok
+int client_send_time(conectador_t* conectador,date_t* date,char* time_char,int cant){
+	int year = date_get_year(date);
+	int month = date_get_month(date);
+	int day = date_get_day(date);
+	int hour = date_get_hour(date);
+	int minute = date_get_minute(date);
+	snprintf(time_char,cant,"%d.%02d.%02d-%02d:%02d:00",year,month,day,hour,minute);
   socket_conectador_send(conectador,time_char,cant);
   return 0;
 }
 
-int validarTemperatura(char* charMedicion){
+int client_validate_temperature(char* charMedicion){
 	float medicion = atof(charMedicion);
 	return (medicion > -17.0 || medicion < 59.7);
 }
 
-int client_free_memory(file_t* file, conectador_t *conect,char* date){
+int client_free_memory(file_t* file, conectador_t *conect,date_t* date){
 	socket_conectador_close(conect);
 	file_close(file);
-  free(date);
+	date_destroit(date);
 	return 0;
 }
 
@@ -59,9 +72,9 @@ int client_free_memory(file_t* file, conectador_t *conect,char* date){
 //   1      2   3    4    5        6   7
 int client(int argc, char* argv[]){
   int cantArguments = 8;
-  int timeArray[6]; //aca se guarda la hora,minuto y segundo
 	char charAnterior[6] = "0.0";
   char charTemperatura[6] = ""; //aca se guarda el temperatura
+
   //comprobar cant parametros
   if (cantArguments != argc){
     printf("Tengo %d argumentos y espero %d argumentos\n",argc,cantArguments);
@@ -81,8 +94,9 @@ int client(int argc, char* argv[]){
   int frecuencia = atoi(argv[5]);
   float velocidad = calcularVelocidad(frecuencia);
 
-  //parseo la hora y lo guardo en el array
-  getHrMinSec(argv[6],&timeArray);
+  //parseo la hora y lo guardo en date_t
+	date_t *date = date_create(argv[6]);
+  //getHrMinSec(argv[6],&timeArray);
 
   //variables para el envio la fecha y hora
   int long_format_time = 20;
@@ -96,43 +110,42 @@ int client(int argc, char* argv[]){
   int long_identificador = 1;
   int hayMediciones; //es para indicar si hay mediciones disponibles
 
-  printTime(&timeArray);
+  //printTime(&timeArray);
+	date_print(date);
   //envio el date
-  send_time(conectador,&timeArray,time_char,long_format_time);
+  client_send_time(conectador,date,time_char,long_format_time);
   //calculo cantidad de datos a enviar
-  cantidad = getQuantity(timeArray[5],velocidad);
-  hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
+  cantidad = client_get_quantity(date,velocidad);
+  hayMediciones = client_get_temp(file,charTemperatura,char_tem_long);
   while (hayMediciones){
-		if (!validarTemperatura(charTemperatura)){
+		if (!client_validate_temperature(charTemperatura)){
 			socket_conectador_send(conectador,charAnterior,char_tem_long);
 		}else{
-			//printf("Temperatura valida %s\n",charTemperatura);
 			socket_conectador_send(conectador,charTemperatura,char_tem_long);
 			strncpy(charAnterior,charTemperatura,6);
 		}
     n++;
     //si ya envie la cantidad correspondiente
-    hayMediciones = obtenterTemperatura(file,charTemperatura,char_tem_long);
+    hayMediciones = client_get_temp(file,charTemperatura,char_tem_long);
     if (n == cantidad || !hayMediciones){
       socket_conectador_send(conectador,barraN,long_identificador);
-      //fprintf(stderr,"%s",barraN);
       fprintf(stderr,"Enviando %d muestras\n",n);
-      wait(&timeArray);
+      date_increment(date);
       if (hayMediciones){
-        printTime(&timeArray); //esto es para el proximo envio
-        send_time(conectador,&timeArray,time_char,long_format_time);
+        date_print(date); //esto es para el proximo envio
+        client_send_time(conectador,date,time_char,long_format_time);
       }
       n = 0; //reinicio el contador;
-      cantidad = getQuantity(timeArray[5],velocidad);
+      cantidad = client_get_quantity(date,velocidad);
     }else{
-      //fprintf(stderr,"%s",espacio);
       socket_conectador_send(conectador,espacio,long_identificador);
     }
   }
   socket_conectador_send(conectador,barraN,long_identificador);
 
-  //cierro conexion
-  client_free_memory(file,conectador,time_char);
+	//es envio todo, cierro conexion
+	free(time_char);
+  client_free_memory(file,conectador,date);
 
 
   return 0;
