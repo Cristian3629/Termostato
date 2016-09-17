@@ -8,7 +8,6 @@
 conectador_t* client_create(char *ip,char *puerto){
 	conectador_t *self = socket_conectador_create();
 	int port = atoi(puerto);
-  //printf("el int del puerto es:%d\n",port);
 	int aux = socket_conectador_connect(self,ip,port);
 	if (aux == -1){
 		printf("Error al conectar con el server\n");
@@ -101,7 +100,9 @@ int client(int argc, char* argv[]){
 
   //variables para el envio la fecha y hora
   int long_format_time = 20;
-	char* time_char = malloc(sizeof(char)*long_format_time);
+	//char* time_char = malloc(sizeof(char)*long_format_time);
+	char time_char[21] = "";
+	time[20] = '\0';
 
   int char_tem_long = 6;
   int cantidad;
@@ -145,7 +146,7 @@ int client(int argc, char* argv[]){
   socket_conectador_send(conectador,barraN,long_identificador);
 
 	//es envio todo, cierro conexion
-	free(time_char);
+	//free(time_char);
   client_free_memory(file,conectador,date);
 
 
