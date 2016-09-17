@@ -42,14 +42,15 @@ int client_get_temp(file_t* file, char temperatura[5], int largo){
 //Pre:esta funcion se encarga de enviar todos los datos respecto al tiempo
 //correspondiente
 //Post:devuelve 0 si salio todo ok
-int client_send_time(conectador_t* conectador,date_t* date,char* time_char,int cant){
+int client_send_time(conectador_t* conect,date_t* date,char* timeChar,int cant){
 	int year = date_get_year(date);
 	int month = date_get_month(date);
 	int day = date_get_day(date);
 	int hour = date_get_hour(date);
 	int minute = date_get_minute(date);
-	snprintf(time_char,cant,"%d.%02d.%02d-%02d:%02d:00",year,month,day,hour,minute);
-  socket_conectador_send(conectador,time_char,cant);
+	snprintf(timeChar,cant,"%d.%02d.%02d-%02d:%02d:00",year,month,day,
+	hour,minute);
+  socket_conectador_send(conect,timeChar,cant);
   return 0;
 }
 
@@ -110,7 +111,7 @@ int client(int argc, char* argv[]){
   int long_identificador = 1;
   int hayMediciones; //es para indicar si hay mediciones disponibles
 
-  //printTime(&timeArray);
+
 	date_print(date);
   //envio el date
   client_send_time(conectador,date,time_char,long_format_time);

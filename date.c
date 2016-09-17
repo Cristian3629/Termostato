@@ -19,12 +19,25 @@ date_t* date_create(char* date_chr){
   return date;
 }
 
+date_t* date_create_empty(){
+	date_t* date = malloc(sizeof(date_t));
+  if (date == NULL){
+    printf("Error create date_t\n");
+    return NULL;
+  }
+	return date;
+}
+
+int date_set(date_t* date,char* date_chr){
+	sscanf(date_chr,"%d.%d.%d-%d:%d:%d",&(date->year),&(date->month),&(date->day),
+  &(date->hour),&(date->minute),&(date->second));
+	return 0;
+}
 
 //Pre:Recibe un date_t*
 //Post:Aumenta en 1 el minuto o lo lleva a 0 si son 60 minutos
 static int date_increment_minute(date_t* date){
-	//printf("date_increment_minute\n");
-  if (date->minute < 59 ){
+  if ( date->minute < 59 ){
     date->minute++;
     return 1;
   }else{
@@ -69,10 +82,10 @@ static void date_set_second(date_t* date){
 int date_increment(date_t* date){
   int cambioHora = 1; //false
   date_set_second(date);
-  if(date_increment_minute(date)==0){
+  if (date_increment_minute(date)==0){
     cambioHora = date_increment_hour(date);
   }
-  if(cambioHora == 0){
+  if (cambioHora == 0){
     date_increment_day(date);
   }
   return 0;

@@ -1,30 +1,25 @@
 #include "server.h"
 
 //calcula el máximo de las temperaturas
-void getMax(float* maxActual,float* num){
+void server_get_max(float* maxActual,float* num){
 	if ((*num) > (*maxActual)){
 		*maxActual = *num;
 	}
 }
 
 //actualiza el mínimo de las temperaturas
-void getMin(float* minActual, float* num){
+void server_get_min(float* minActual, float* num){
 	if((*num)<(*minActual)){
 		*minActual = *num;
 	}
 }
 
-//actualiza la sumatoria de todas las temperaturas
-void refreshSum(float* sumatoria,float* num){
-	*sumatoria = *sumatoria + *num;
-}
-
-float getFloat(char* charFloat){
+float server_get_float(char* charFloat){
 	return atof(charFloat);
 }
 
 
-void formatParamaters(float* max,float* min,lista_t* list,int *cantidad){
+void server_format_parameter(float* max,float* min,lista_t* list,int *cantidad){
 	*max = -18.0;
 	*min = 60.0;
 	while(!lista_esta_vacia(list)){
@@ -33,36 +28,41 @@ void formatParamaters(float* max,float* min,lista_t* list,int *cantidad){
 	*cantidad = 0;
 }
 
-void printInfo(int (*list)[6],char* id,float* max,float* min,lista_t* lista,
-int* cantidadPorDia, int resta){
+void server_print_date(date_t* date,int resta){
+	int year = date_get_year(date);
+	int month = date_get_month(date);
+	int day = date_get_day(date);
+	printf("%d.%02d.%02d ",year,month,day-resta);
+}
+
+float server_calc_median(lista_t* lista){
 	float mediana;
 	if (getLargo(lista) % 2 == 0){
-		//printf("El largo es:%d\n",getLargo(lista));
-		//printf("getLargo(lista)/2 :%d\n",getLargo(lista)/2);
-		//printf("getLargo(lista)/2 + 1:%d\n",(getLargo(lista)/2) + 1);
-		//printf("Pos1:%d pos2:%d\n",getLargo(lista)/2,(getLargo(lista))/2 +1);
 		float valor1 = lista_posicion(lista,getLargo(lista)/2);
 		float valor2 = lista_posicion(lista,(getLargo(lista)/2) + 1);
-		//printf("Los valores son:%f y %f\n",valor1,valor2 );
 		mediana = (valor1 + valor2)/2;
 		mediana = mediana - 0.01;
 	}else{
 		mediana = lista_posicion(lista,getLargo(lista)/2 + 1);
 	}
-	//printf("Mediana:%f\n", mediana);
-	printf("%d.%02d.%02d %s Max=%.1f Min=%.1f Mediana=%.1f Muestras=%d\n",
-	(*list)[0],(*list)[1],(*list)[2]-resta,id,*max,*min,mediana,*cantidadPorDia);
-	//printf("Imprimi la lista\n");
-	//printList(lista);
-	//printf("largo de la lista:%d\n",getLargo(lista));
-	formatParamaters(max,min,lista,cantidadPorDia);
+	return mediana;
+}
+
+void server_print_info(date_t* date,char* id,float* max,float* min,
+	lista_t* lista,int* cantidadPorDia, int resta){
+	float mediana = server_calc_median(lista);
+	server_print_date(date,resta);
+	printf("%s Max=%.1f Min=%.1f Mediana=%.1f Muestras=%d\n",id,*max,*min,mediana,
+	*cantidadPorDia);
+	server_format_parameter(max,min,lista,cantidadPorDia);
 }
 
 
 
-int detectChangeDay(char* dateTime, int (*lista)[6]){
-	getHrMinSec(dateTime,lista);
-	return (*lista)[3] == 0 && (*lista)[4]==0;
+int server_detect_change_day(date_t* date,char* dateTime){
+	int hour = date_get_hour(date);
+	int minute = date_get_minute(date);
+	return hour == 0 && minute == 0;
 }
 
 int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
@@ -86,9 +86,8 @@ int server_prepare_connect(char *prt, conectador_t **conec, aceptador_t **acep){
 }
 
 //la funcion receive devuelve -1 cuando la conexion se cierra
-int receive_time(conectador_t* canal,char* time_char,int largo){
+int server_receive_time(conectador_t* canal,char* time_char,int largo){
 	int resultado = socket_conectador_receive(canal,time_char,largo);
-	//printf("resultado de receive_time:%d\n",resultado);
 	return resultado;
 }
 
@@ -99,7 +98,7 @@ int server_free_memory(conectador_t *conect,aceptador_t* acept,char* hour){
 	return 0;
 }
 
-
+//---------------Funcion principal--------------//
 int server(int argc,char* argv[]){
   if (argc < 3) {
 		printf("Falta argumentos\n");
@@ -134,22 +133,24 @@ int server(int argc,char* argv[]){
 	lista_t* lista = lista_crear();
 	int cantidadPorMinuto = 0;
 	int cantidadPorDia = 0;
-	int arrayTime[6]; //aca voy guardado el date
+
+	//aca voy guardado el date
+	date_t* date = date_create_empty();
 	float number;
+
 	//recibo el date junto con las mediciones
-	while (receive_time(canal,time_char,long_format_time) != -1){
+	while (server_receive_time(canal,time_char,long_format_time) != -1){
 		fprintf(stderr, "%s - ",time_char);
-		//printf("%s - ", time_char);
-		if (detectChangeDay(time_char,&arrayTime)){
-			printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia,1);
+		date_set(date,time_char);
+		if (server_detect_change_day(date,time_char)){
+			server_print_info(date,id_termostato,&max,&min,lista,&cantidadPorDia,1);
 		}
 		strncpy(identificador," ",long_format_ident);
 		while (strncmp(identificador," ",long_format_ident) == 0) {
 			socket_conectador_receive(canal,temp_char,long_format_temp);
-			number = getFloat(temp_char);
-			//printf("El numero flotante es:%f-", number);
-			getMin(&min,&number);
-			getMax(&max,&number);
+			number = server_get_float(temp_char);
+			server_get_min(&min,&number);
+			server_get_max(&max,&number);
 			lista_insertar(lista,number);
 			cantidadPorMinuto++;
 			cantidadPorDia++;
@@ -162,12 +163,14 @@ int server(int argc,char* argv[]){
 		cantidadPorMinuto = 0;
 	}
 	//refreshSum(&sumatoria,&number);
-	printInfo(&arrayTime,id_termostato,&max,&min,lista,&cantidadPorDia,0);
+	server_print_info(date,id_termostato,&max,&min,lista,&cantidadPorDia,0);
 	fprintf(stderr,"Termostato desconectado. ID=%s\n", id_termostato);
+
+	//optimizar
 	free(identificador);
 	free(temp_char);
 	lista_destruir(lista);
-
+	date_destroit(date);
 	server_free_memory(canal,aceptador,time_char);
   return 1;
 }

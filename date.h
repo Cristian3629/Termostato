@@ -8,7 +8,9 @@ typedef struct date date_t;
 
 //Funciones
 date_t* date_create(char* date);
+date_t* date_create_empty();
 int date_destroit(date_t* date);
+int date_set(date_t*date,char* date_chr);
 //private
 // int date_increment_minute(date_t* date);
 // int date_increment_hour(date_t* date);
