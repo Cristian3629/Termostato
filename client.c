@@ -102,7 +102,7 @@ int client(int argc, char* argv[]){
   int long_format_time = 20;
 	//char* time_char = malloc(sizeof(char)*long_format_time);
 	char time_char[21] = "";
-	time[20] = '\0';
+	time_char[20] = '\0';
 
   int char_tem_long = 6;
   int cantidad;
