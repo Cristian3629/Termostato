@@ -96,11 +96,10 @@ int client(int argc, char* argv[]){
 
   //parseo la hora y lo guardo en date_t
 	date_t *date = date_create(argv[6]);
-  //getHrMinSec(argv[6],&timeArray);
 
   //variables para el envio la fecha y hora
   int long_format_time = 20;
-	//char* time_char = malloc(sizeof(char)*long_format_time);
+
 	char time_char[21] = "";
 	time_char[20] = '\0';
 
@@ -146,7 +145,6 @@ int client(int argc, char* argv[]){
   socket_conectador_send(conectador,barraN,long_identificador);
 
 	//es envio todo, cierro conexion
-	//free(time_char);
   client_free_memory(file,conectador,date);
 
 
